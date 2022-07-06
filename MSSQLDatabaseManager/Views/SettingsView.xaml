@@ -1,0 +1,41 @@
+﻿<Page x:Class="MSSQLDatabaseManager.Views.SettingsView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MSSQLDatabaseManager.Views"
+      xmlns:viewModels="clr-namespace:MSSQLDatabaseManager.ViewModels"
+      mc:Ignorable="d" d:DataContext="{d:DesignInstance viewModels:SettingsViewModel}"
+      d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Directory setting">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Directory for data: " VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" BorderBrush="#955" Height="20" Text="{Binding PathToData, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="2" Content="Browse" Width="50" Height="20" Margin="3,0,3,0" Command="{Binding BrowsePathCmd}"/>
+                <Button Grid.Column="3" Content="Save" Width="50" Height="20" Command="{Binding SavePathCmd}"/>
+            </Grid>
+        </GroupBox>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="2" Content="Save all" Width="50" Height="20" Margin="3" Command="{Binding SaveAllCmd}"/>
+        </Grid>
+    </Grid>
+</Page>
