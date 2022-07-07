@@ -47,6 +47,18 @@ namespace MSSQLDatabaseManager.Entities
             }
         }
 
+        private bool _isUsed;
+        [JsonIgnore]
+        public bool IsUsed
+        {
+            get => _isUsed;
+            set
+            {
+                _isUsed = value;
+                RaisePropertyChanged(() => IsUsed);
+            }
+        }
+
         private string _comment;
 
         public string Comment
@@ -83,12 +95,13 @@ namespace MSSQLDatabaseManager.Entities
             Id   = id;
         }
 
-        public NDatabase(string instanceName, string name, int id, string comment)
+        public NDatabase(string instanceName, string name, int id, string comment, bool used = false)
         {
             InstanceName = instanceName;
-            Name     = name;
-            Id       = id;
-            Comment  = comment;
+            Name         = name;
+            Id           = id;
+            Comment      = comment;
+            IsUsed       = used;
         }
 
         public NDatabase()

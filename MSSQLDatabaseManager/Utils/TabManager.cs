@@ -51,6 +51,8 @@ namespace MSSQLDatabaseManager.Utils
             TabList.Add(new Tab("Db data copy", TabType.DbDataCopy));
             TabList.Add(new Tab("Settings", TabType.Settings));
             SelectedTab = TabList.FirstOrDefault();
+
+            Logger.Info($"Tabs init succ");
         }
 
         //public void OpenSettingsTab()

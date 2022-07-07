@@ -76,17 +76,7 @@ namespace MSSQLDatabaseManager.Utils
                 Page             = new SettingsView();
                 Page.DataContext = new SettingsViewModel();
             }
-            //if (Account == null)
-            //{
-            //    Page             = new NewPageView();
-            //    Page.DataContext = new NewPageViewModel(((NewPageView)Page).AccDG);
-            //}
-            //else
-            //{
-            //    Page             = new BrowserPageView();
-            //    Page.DataContext = new BrowserPageViewModel(acc);
-            //}
-            CloseCmd = new DelegateCommand(OnClose);
+            //CloseCmd = new DelegateCommand(OnClose);
         }
 
         private void OnClose()

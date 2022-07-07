@@ -49,13 +49,9 @@ namespace MSSQLDatabaseManager.Utils
             var lst = new List<NDatabase>();
             try
             {
-                var cred = g.Settings.GetCredForInstance(instanceName);
                 using (SqlConnection con = new SqlConnection(g.GetConnString(instanceName)))
                 {
                     con.Open();
-
-
-
                     using (SqlCommand cmd = new SqlCommand("SELECT * from sys.databases", con))
                     using (SqlDataReader dr = cmd.ExecuteReader())
                         while (dr.Read())
@@ -81,7 +77,7 @@ namespace MSSQLDatabaseManager.Utils
             {
                 con.Open();
 
-                var cmd1 = new SqlCommand($"ALTER DATABASE {db.Name} SET single_user;",                 con);
+                var cmd1 = new SqlCommand($"ALTER DATABASE {db.Name} SET single_user with rollback immediate;",                 con);
                 var cmd2 = new SqlCommand($"ALTER DATABASE {db.Name} MODIFY NAME = {db.IdName};", con);
                 var cmd3 = new SqlCommand($"ALTER DATABASE {db.IdName} SET MULTI_USER;",          con);
 
@@ -110,7 +106,7 @@ namespace MSSQLDatabaseManager.Utils
             }
         }
 
-        public static void RestoreDatabase(InstanceDb instance, string databaseName, string bakFilePath, string dataDirPath) 
+        public static int RestoreDatabase(InstanceDb instance, string bakFilePath, string dataDirPath) 
         {
             Logger.Info("RestoreDatabase()");
 
@@ -128,35 +124,48 @@ namespace MSSQLDatabaseManager.Utils
                 var srv = new Server(conn);
 
                 var res = new Restore();
+
+                var idList = srv.Databases.Cast<Database>().Select(x => x.ID).ToList();
+                var id     = 1;
+                for (var i = 0; i < idList.Count; i++)
+                {
+                    if (idList.Contains(id))
+                        id++;
+                    else
+                        break;
+                }
+
                 res.Devices.AddDevice(bakFilePath, DeviceType.File);
 
                 res.RelocateFiles.Add(new RelocateFile
                 {
                     LogicalFileName = res.ReadFileList(srv).Rows[0][0].ToString(),
-                    PhysicalFileName = $"{dataDirPath}\\{instance.DatabaseName}_temp.mdf"
+                    PhysicalFileName = $"{dataDirPath}\\{id}\\{instance.DatabaseName}.mdf"
                 });
                 res.RelocateFiles.Add(new RelocateFile
                 {
                     LogicalFileName = res.ReadFileList(srv).Rows[1][0].ToString(),
-                    PhysicalFileName = $"{dataDirPath}\\{instance.DatabaseName}_temp.ldf"
+                    PhysicalFileName = $"{dataDirPath}\\{id}\\{instance.DatabaseName}_log.ldf"
                 });
                 res.RelocateFiles.Add(new RelocateFile
                 {
                     LogicalFileName = res.ReadFileList(srv).Rows[2][0].ToString(),
-                    PhysicalFileName = $"{dataDirPath}\\Filestore"
+                    PhysicalFileName = $"{dataDirPath}\\{id}\\Filestore"
                 });
 
+                if (!Directory.Exists($"{dataDirPath}\\{id}"))
+                    Directory.CreateDirectory($"{dataDirPath}\\{id}");
 
-                res.Database                    =  databaseName;
+                res.Database                    =  $"{instance.DatabaseName}_{id}";
                 res.NoRecovery                  =  false;
                 res.ReplaceDatabase             =  true;
                 res.PercentCompleteNotification =  1;
                 res.PercentComplete             += (sender, args) => { g.LoadingControlVM.LoadingText = $"Restore backup, please wait... [{args.Percent}%]"; };
                 res.SqlRestore(srv);
                 srv.Refresh();
-                srv.Databases["SOFTMARINE_COMPANY_temp"].FileGroups[1].Files[0].Rename($"{g.Settings.DirForDbData}\\DbData\\{instance.DisplayName.Replace("/", "\\")}\\5\\{instance.DatabaseName}.mdf");
                 conn.Disconnect();
                 Logger.Info("RestoreDatabase() succ");
+                return id;
             }
             catch (SmoException ex)
             {
@@ -170,18 +179,32 @@ namespace MSSQLDatabaseManager.Utils
             {
                 Logger.ErrorQ(ex, "RestoreDatabase -> Exception");
             }
+
+            return 0;
         }
 
-        public static void RelocateDatabase(InstanceDb instance, string databaseName, string dataDirPath)
+        public static void DeleteDatabase(InstanceDb instance, string databaseName)
         {
             Logger.Info("RestoreDatabase()");
 
             try
             {
-                //detach
-                //windows move
-                //attach
+                var conn = new ServerConnection
+                           {
+                               ServerInstance   = $"{g.CompName}\\{instance.InstanceName}",
+                               StatementTimeout = int.MaxValue,
+                               LoginSecure      = false,
+                               Login            = instance.Login,
+                               Password         = instance.Password
+                           };
 
+                var srv = new Server(conn);
+                srv.KillAllProcesses(databaseName);
+                var db = srv.Databases[databaseName];
+                
+                db.Drop();
+
+                conn.Disconnect();
 
                 Logger.Info("RestoreDatabase() succ");
             }

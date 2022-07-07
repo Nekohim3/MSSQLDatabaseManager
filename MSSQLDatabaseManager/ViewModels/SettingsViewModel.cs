@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,7 +35,8 @@ namespace MSSQLDatabaseManager.ViewModels
         #region Commands
 
         public DelegateCommand BrowsePathCmd { get; }
-        public DelegateCommand SavePathCmd { get; }
+        public DelegateCommand SavePathCmd   { get; }
+        public DelegateCommand OpenDataPathCmd   { get; }
 
         public DelegateCommand SaveAllCmd { get; }
 
@@ -44,8 +46,9 @@ namespace MSSQLDatabaseManager.ViewModels
 
         public SettingsViewModel()
         {
-            BrowsePathCmd = new DelegateCommand(OnBrowse);
-            SavePathCmd   = new DelegateCommand(OnSavePath, () => PathToData != g.Settings.DirForDbData);
+            BrowsePathCmd   = new DelegateCommand(OnBrowse);
+            SavePathCmd     = new DelegateCommand(OnSavePath, () => PathToData != g.Settings.DirForDbData);
+            OpenDataPathCmd = new DelegateCommand(OnOpenDataPath);
 
             SaveAllCmd = new DelegateCommand(OnSaveAll);
 
@@ -77,6 +80,11 @@ namespace MSSQLDatabaseManager.ViewModels
         {
             g.Settings.SetDir(PathToData);
             RaiseCanExecChanged();
+        }
+
+        private void OnOpenDataPath()
+        {
+            Process.Start(g.Settings.DirForDbData);
         }
 
         private void OnSaveAll()

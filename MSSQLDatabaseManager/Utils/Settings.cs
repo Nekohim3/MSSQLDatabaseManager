@@ -35,17 +35,17 @@ namespace MSSQLDatabaseManager.Utils
 
         public bool AddInstance(InstanceDb db)
         {
-            Logger.Info($"AddDb({db.InstanceName}_{db.DatabaseName})");
+            Logger.Info($"AddInstance ({db.InstanceName}\\{db.DatabaseName}) start");
             if (InstanceList.Count(x => x.InstanceName == db.InstanceName && x.DatabaseName == db.DatabaseName) != 0)
             {
-                Logger.Info($"AddDb({db.InstanceName}_{db.DatabaseName}) fail: alreadyExist");
+                Logger.Info($"AddInstance ({db.InstanceName}\\{db.DatabaseName}) fail: already exist");
                 return false;
 
             }
 
             InstanceList.Add(db);
             Save();
-            Logger.Info($"AddDb({db.InstanceName}_{db.DatabaseName}) succ");
+            Logger.Info($"AddInstance ({db.InstanceName}\\{db.DatabaseName}) succ");
             return true;
 
         }
@@ -53,14 +53,21 @@ namespace MSSQLDatabaseManager.Utils
         public void RemoveInstance(InstanceDb db)
         {
             var q = InstanceList.Remove(db);
-            Logger.Info($"RemoveDb({db.InstanceName}_{db.DatabaseName}) {(q ? "succ" : "fail (not found)")}");
+            Logger.Info($"RemoveInstance ({db.InstanceName}_{db.DatabaseName}) {(q ? "succ" : "fail: not found")}");
             Save();
         }
 
         public void CheckDbList(List<NDatabase> list)
         {
             var savedList = !File.Exists("databases.cfg") ? new List<NDatabase>() : JsonConvert.DeserializeObject<List<NDatabase>>(File.ReadAllText("databases.cfg"));
-            var forAdd    = list.Where(x => savedList.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList(); 
+            var forAdd    = list.Where(x => savedList.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList();
+            foreach (var x in forAdd)
+                savedList.Add(x);
+            var forDelete = savedList.Where(x => list.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList();
+            foreach (var x in forDelete)
+            {
+                savedList.Remove(x);
+            }
             var forEdit   = new List<NDatabase>();
             foreach (var x in list)
             {
@@ -68,8 +75,6 @@ namespace MSSQLDatabaseManager.Utils
                 if(c != null && c.Comment != x.Comment)
                     forEdit.Add(x);
             }
-            foreach (var x in forAdd)
-                savedList.Add(x);
             foreach (var x in forEdit)
             {
                 var c = savedList.FirstOrDefault(v => v.InstanceName == x.InstanceName && v.Id == x.Id);

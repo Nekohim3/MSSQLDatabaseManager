@@ -9,6 +9,8 @@ using MSSQLDatabaseManager.Utils;
 
 namespace MSSQLDatabaseManager
 {
+    public enum NMsgReply {Null, None, Yes, No, Cancel, Ok}
+    public enum NMsgButtons {YesNo, OkCancel, YesNoCancel, Ok}
     public static class g
     {
         public static Settings Settings { get; set; }
@@ -16,13 +18,17 @@ namespace MSSQLDatabaseManager
         public static TabManager TabManager { get; set; }
 
         public static LoadingControlViewModel LoadingControlVM { get; set; }
+        public static NMsgViewModel           NMsgVM    { get; set; }
+
+        public static NMsgReply MsgShow(string msg, string title, NMsgButtons buttons) => NMsgVM.Show(msg, title, buttons);
+        public static NMsgReply MsgShow(string msg, string title) => NMsgVM.Show(msg, title);
 
         public static void Init()
         {
             Settings   = Settings.Load() ?? new Settings();
+            Logger.Info("Settings loaded");
             TabManager = new TabManager();
             TabManager.InitTabs();
-            //TabManager.OpenSettingsTab();
         }
 
         public static string GetConnString(string instanceName)

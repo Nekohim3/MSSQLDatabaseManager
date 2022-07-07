@@ -2,7 +2,11 @@
                     x:Class="MSSQLDatabaseManager.UI.VS2012WindowStyle"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                     xmlns:local="clr-namespace:MSSQLDatabaseManager"
-                    xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing">
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                    mc:Ignorable="d"
+                    xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
+                    xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI">
 
     <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#222" />
     <SolidColorBrush x:Key="VS2012WindowBorderBrush" Color="#955" />
@@ -185,9 +189,9 @@
                                         </Border>
                                     </Grid>
                                     <ContentPresenter Grid.Row="1"/>
-                                    <Grid Grid.Row="0" Grid.RowSpan="2" Background="#77000000" x:Name="LoadingControl" Visibility="{Binding LoadingVisibility}">
+                                    <Grid Grid.Row="0" Grid.RowSpan="2" Background="#77000000" x:Name="LoadingControl" Visibility="{Binding LoadingVisibility}" d:DataContext="{d:DesignInstance ui:LoadingControlViewModel}">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="10*"/>
+                                            <RowDefinition Height="6*"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         <ContentControl Grid.Row="0">
@@ -294,6 +298,38 @@
                                             </ContentControl.Template>
                                         </ContentControl>
                                         <TextBlock Grid.Row="1" Text="{Binding LoadingText}" HorizontalAlignment="Center" FontSize="30"/>
+                                    </Grid>
+                                    <Grid SnapsToDevicePixels="true" Grid.Row="0" Grid.RowSpan="2" Background="#77000000" x:Name="NMsgControl" Visibility="{Binding MsgVisibility}" d:DataContext="{d:DesignInstance ui:NMsgViewModel}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="25" MinHeight="25" MaxHeight="25"/>
+                                            <RowDefinition Height="Auto" MinHeight="50"/>
+                                            <RowDefinition Height="25" MinHeight="25" MaxHeight="25"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="1000"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,1">
+                                            <Border BorderBrush="#c55" BorderThickness="1"/>
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" TextAlignment="Center" Margin="5"/>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="2" Margin="0,-2,0,1">
+                                            <Border BorderBrush="#c55" BorderThickness="1"/>
+                                            <TextBlock Text="{Binding MsgText}" TextWrapping="Wrap" Margin="5" MaxWidth="990"/>
+                                        </Grid>
+                                        <Grid Grid.Column="1" Grid.Row="3" Margin="0,-2,0,0">
+                                            <Border BorderBrush="#c55" BorderThickness="1"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Command="{Binding YesCmd}" Visibility="{Binding YesVisibility}" Content="Yes" Margin="3" Width="50"/>
+                                                <Button Command="{Binding NoCmd}" Visibility="{Binding NoVisibility}" Content="No" Margin="3" Width="50"/>
+                                                <Button Command="{Binding OkCmd}" Visibility="{Binding OkVisibility}" Content="Ok" Margin="3" Width="50"/>
+                                                <Button Command="{Binding CancelCmd}" Visibility="{Binding CancelVisibility}" Content="Cancel" Margin="3" Width="50"/>
+                                            </StackPanel>
+                                        </Grid>
+
                                     </Grid>
                                 </Grid>
                             </Border>

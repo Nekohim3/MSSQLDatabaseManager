@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
+using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.ViewModel;
 
 namespace MSSQLDatabaseManager.UI
@@ -61,6 +64,191 @@ namespace MSSQLDatabaseManager.UI
             //LoadingText = "Restore database, please wait... [59%]";
         }
     }
+    
+    public class NMsgViewModel : NotificationObject
+    {
+        private NMsgReply _reply;
+
+        public NMsgReply Reply
+        {
+            get => _reply;
+            set
+            {
+                _reply = value;
+                RaisePropertyChanged(() => Reply);
+            }
+        }
+
+        private string _msgText;
+
+        public string MsgText
+        {
+            get => _msgText;
+            set
+            {
+                _msgText = value;
+                RaisePropertyChanged(() => MsgText);
+            }
+        }
+
+        private string _title;
+
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                RaisePropertyChanged(() => Title);
+            }
+        }
+
+        public Visibility MsgVisibility => IsMsgVisible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility YesVisibility => IsYesVisible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NoVisibility => IsNoVisible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility OkVisibility => IsOkVisible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility CancelVisibility => IsCancelVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        private bool _isMsgVisible;
+
+        public bool IsMsgVisible
+        {
+            get => _isMsgVisible;
+            set
+            {
+                _isMsgVisible = value;
+                RaisePropertyChanged(() => IsMsgVisible);
+                RaisePropertyChanged(() => MsgVisibility);
+                
+            }
+        }
+
+        private bool _isYesVisible;
+
+        public bool IsYesVisible
+        {
+            get => _isYesVisible;
+            set
+            {
+                _isYesVisible = value;
+                RaisePropertyChanged(() => IsYesVisible);
+                RaisePropertyChanged(() => YesVisibility);
+            }
+        }
+
+        private bool _isNoVisible;
+
+        public bool IsNoVisible
+        {
+            get => _isNoVisible;
+            set
+            {
+                _isNoVisible = value;
+                RaisePropertyChanged(() => IsNoVisible);
+                RaisePropertyChanged(() => NoVisibility);
+            }
+        }
+
+        private bool _isOkVisible;
+
+        public bool IsOkVisible
+        {
+            get => _isOkVisible;
+            set
+            {
+                _isOkVisible = value;
+                RaisePropertyChanged(() => IsOkVisible);
+                RaisePropertyChanged(() => OkVisibility);
+            }
+        }
+
+        private bool _isCancelVisible;
+
+        public bool IsCancelVisible
+        {
+            get => _isCancelVisible;
+            set
+            {
+                _isCancelVisible = value;
+                RaisePropertyChanged(() => IsCancelVisible);
+                RaisePropertyChanged(() => CancelVisibility);
+            }
+        }
+
+        public DelegateCommand YesCmd { get; }
+        public DelegateCommand NoCmd { get; }
+        public DelegateCommand OkCmd { get; }
+        public DelegateCommand CancelCmd { get; }
+
+        public NMsgViewModel()
+        {
+            YesCmd = new DelegateCommand(OnYes);
+            NoCmd = new DelegateCommand(OnNo);
+            OkCmd = new DelegateCommand(OnOk);
+            CancelCmd = new DelegateCommand(OnCancel);
+        }
+
+        public NMsgReply Show(string message, string title)
+        {
+            return Show(message, title, NMsgButtons.Ok);
+        }
+
+        public NMsgReply Show(string message, string title, NMsgButtons buttons)
+        {
+            Clear();
+            MsgText = message;
+            Title   = title;
+            if (buttons == NMsgButtons.Ok)
+                IsOkVisible = true;
+            if (buttons == NMsgButtons.YesNo)
+                IsYesVisible = IsNoVisible = true;
+            if (buttons == NMsgButtons.OkCancel)
+                IsOkVisible = IsCancelVisible = true;
+            if (buttons == NMsgButtons.YesNoCancel)
+                IsYesVisible = IsNoVisible = IsCancelVisible = true;
+            IsMsgVisible = true;
+            while (IsMsgVisible)
+            {
+                Application.Current.Dispatcher.Invoke(() => { Thread.Sleep(50); }, DispatcherPriority.Background);
+            }
+
+            return Reply;
+        }
+
+        private void Clear()
+        {
+            Title           = string.Empty;
+            MsgText         = string.Empty;
+            IsYesVisible    = false;
+            IsNoVisible     = false;
+            IsOkVisible     = false;
+            IsCancelVisible = false;
+        }
+
+        private void OnYes()
+        {
+            Reply         = NMsgReply.Yes;
+            IsMsgVisible = false;
+        }
+
+        private void OnNo()
+        {
+            Reply        = NMsgReply.No;
+            IsMsgVisible = false;
+        }
+
+        private void OnOk()
+        {
+            Reply        = NMsgReply.Ok;
+            IsMsgVisible = false;
+        }
+
+        private void OnCancel()
+        {
+            Reply        = NMsgReply.Cancel;
+            IsMsgVisible = false;
+        }
+    }
 
     public partial class VS2012WindowStyle
     {
@@ -71,6 +259,9 @@ namespace MSSQLDatabaseManager.UI
             var loadingControl = (Grid)w.Template.FindName("LoadingControl", w);
             g.LoadingControlVM         = new LoadingControlViewModel();
             loadingControl.DataContext = g.LoadingControlVM;
+            var nMsgControl = (Grid)w.Template.FindName("NMsgControl", w);
+            g.NMsgVM                = new NMsgViewModel();
+            nMsgControl.DataContext = g.NMsgVM;
         }
 
         void WindowStateChanged(object sender, EventArgs e)

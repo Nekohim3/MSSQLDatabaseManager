@@ -18,14 +18,16 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Directory for data: " VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" BorderBrush="#955" Height="20" Text="{Binding PathToData, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Column="2" Content="Browse" Width="50" Height="20" Margin="3,0,3,0" Command="{Binding BrowsePathCmd}"/>
-                <Button Grid.Column="3" Content="Save" Width="50" Height="20" Command="{Binding SavePathCmd}"/>
+                <Button Grid.Column="0" Content="Open" Width="50" Height="20" Margin="0,0,3,0" Command="{Binding OpenDataPathCmd}"/>
+                <TextBlock  Grid.Column="1" Text="Directory for data: " VerticalAlignment="Center"/>
+                <TextBox Grid.Column="2" BorderBrush="#955" Height="20" Text="{Binding PathToData, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="3" Content="Browse" Width="50" Height="20" Margin="3,0,3,0" Command="{Binding BrowsePathCmd}"/>
+                <Button Grid.Column="4" Content="Save" Width="50" Height="20" Command="{Binding SavePathCmd}"/>
             </Grid>
         </GroupBox>
 
