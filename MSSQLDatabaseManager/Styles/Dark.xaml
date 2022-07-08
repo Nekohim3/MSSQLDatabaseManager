@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="Spinner1" Color="#7c55" />
+    <SolidColorBrush x:Key="Spinner2" Color="#9c55" />
+    <SolidColorBrush x:Key="Spinner3" Color="#bc55" />
+    <SolidColorBrush x:Key="Spinner4" Color="#dc55" />
+    <SolidColorBrush x:Key="Spinner5" Color="#fc55" />
+    <SolidColorBrush x:Key="DGH" Color="#333" />
+    <SolidColorBrush x:Key="DGHMO" Color="#555" />
+    <SolidColorBrush x:Key="Gray0" Color="#000" />
+    <SolidColorBrush x:Key="Gray2" Color="#222" />
+    <SolidColorBrush x:Key="Gray3" Color="#333" />
+    <SolidColorBrush x:Key="Gray5" Color="#555" />
+    <SolidColorBrush x:Key="Gray7" Color="#777" />
+    <SolidColorBrush x:Key="Gray79" Color="#99777777" />
+    <SolidColorBrush x:Key="Gray7T" Color="#55777777" />
+    <SolidColorBrush x:Key="GrayC" Color="#ccc" />
+    <SolidColorBrush x:Key="GrayF" Color="#fff" />
+    <SolidColorBrush x:Key="RedC" Color="#c55" />
+    <SolidColorBrush x:Key="WeakRed" Color="#955" />
+    <SolidColorBrush x:Key="WeakRedT" Color="#55905050" />
+    <SolidColorBrush x:Key="StrongRed" Color="#f55" />
+    <SolidColorBrush x:Key="FullRed" Color="#f00" />
+    <SolidColorBrush x:Key="DarkRed" Color="#522" />
+    <SolidColorBrush x:Key="Trans010" Color="#01000000" />
+    <SolidColorBrush x:Key="Trans770" Color="#77000000" />
+    <SolidColorBrush x:Key="AllBg" Color="#77000000" />
+    
+</ResourceDictionary>

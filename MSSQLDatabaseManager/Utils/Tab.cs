@@ -69,7 +69,8 @@ namespace MSSQLDatabaseManager.Utils
             }
             if (type == TabType.DbDataCopy)
             {
-
+                Page             = new DBCopyManagerView();
+                Page.DataContext = new DBCopyManagerViewModel();
             }
             if (type == TabType.Settings)
             {

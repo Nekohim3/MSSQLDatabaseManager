@@ -14,6 +14,18 @@ namespace MSSQLDatabaseManager.Utils
 {
     public class Settings
     {
+        private Skin _theme;
+
+        public Skin Theme
+        {
+            get => _theme;
+            set
+            {
+                _theme = value;
+                (App.Current as App).ChangeSkin(_theme);
+            }
+        }
+
         public string                           DirForDbData { get; set; }
         public ObservableCollection<InstanceDb> InstanceList { get; set; }
 

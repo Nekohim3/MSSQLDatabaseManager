@@ -210,14 +210,17 @@ namespace MSSQLDatabaseManager.Utils
             }
             catch (SmoException ex)
             {
+                throw ex;
                 Logger.ErrorQ(ex, "RestoreDatabase -> SmoException");
             }
             catch (IOException ex)
             {
+                throw ex;
                 Logger.ErrorQ(ex, "RestoreDatabase -> IOException");
             }
             catch (Exception ex)
             {
+                throw ex;
                 Logger.ErrorQ(ex, "RestoreDatabase -> Exception");
             }
         }
@@ -272,6 +275,7 @@ namespace MSSQLDatabaseManager.Utils
 
                 bkp.Devices.AddDevice(filePath, DeviceType.File);
                 bkp.Incremental = false;
+                bkp.Initialize  = true;
 
                 bkp.PercentCompleteNotification = 1;
                 bkp.PercentComplete += (sender, args) => { g.LoadingControlVM.LoadingText= $"Creating backup, please wait... [{args.Percent}%]"; };
@@ -301,113 +305,5 @@ namespace MSSQLDatabaseManager.Utils
                 return false;
             }
         }
-
-        //public static List<BackupClass> GetBackups(DataBase db)
-        //{
-        //    Logger.Info($"GetBackups({db.Instance}_{db.Name})");
-        //    try
-        //    {
-        //        if (!Directory.Exists($"{g.Settings.DirForDbData}\\{db.Instance}_{db.Name}"))
-        //            Directory.CreateDirectory($"{g.Settings.DirForDbData}\\{db.Instance}_{db.Name}");
-
-        //        var lst = new List<BackupClass>();
-
-        //        foreach (var item in Directory.GetDirectories($"{g.Settings.DirForDbData}\\{db.Instance}_{db.Name}"))
-        //        {
-        //            if (!File.Exists($"{item}\\data.xml")) continue;
-        //            var formatter = new XmlSerializer(typeof(BackupClass));
-
-        //            using (var fs = new FileStream($"{item}\\data.xml", FileMode.Open))
-        //                lst.Add((BackupClass)formatter.Deserialize(fs));
-        //        }
-
-        //        Logger.Info($"GetBackups({db.Instance}_{db.Name}) succ");
-        //        return lst;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.ErrorQ(ex, $"GetBackups({db.Instance}_{db.Name})");
-        //        return null;
-        //    }
-        //}
-
-        //public static bool RemoveDatabase(string serverName, string dbName)
-        //{
-        //    Logger.Info($"RemoveDatabase({serverName}_{dbName})");
-        //    try
-        //    {
-        //        var conn = new ServerConnection
-        //        {
-        //            ServerInstance = serverName,
-        //            StatementTimeout = int.MaxValue,
-        //            LoginSecure = false,
-        //            Login = g.Settings.Login,
-        //            Password = g.Settings.Pass
-        //        };
-
-        //        var srv = new Server(conn);
-
-        //        foreach (Database item in srv.Databases)
-        //        {
-        //            if (item.Name != dbName) continue;
-        //            srv.KillAllProcesses(item.Name);
-        //            item.Drop();
-
-        //            Logger.Info($"RemoveDatabase({dbName}_{dbName}) succ");
-        //            return true;
-        //        }
-
-        //        Logger.Info($"RemoveDatabase({dbName}_{dbName}) fail (db not found)");
-        //        return false;
-        //    }
-
-        //    catch (SmoException ex)
-        //    {
-        //        Logger.ErrorQ(ex, "RemoveDatabase -> SmoException");
-        //        return false;
-        //    }
-        //    catch (IOException ex)
-        //    {
-        //        Logger.ErrorQ(ex, "RemoveDatabase -> IOException");
-        //        return false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.ErrorQ(ex, "RemoveDatabase -> Exception");
-        //        return false;
-        //    }
-        //}
-
-        //public static string GetUsedBackup(DataBase db)
-        //{
-        //    Logger.Info($"GetUsedBackup({db.Instance}\\{db.Name})");
-        //    foreach (var item in Directory.GetDirectories($"{g.Settings.DirForDbData}\\{db.Instance}_{db.Name}"))
-        //    {
-        //        var files = Directory.GetFiles(item);
-        //        if (files.Length > 2)
-        //        {
-        //            Logger.Info($"GetUsedBackup({db.Instance}\\{db.Name}) succ");
-        //            return Path.GetFileNameWithoutExtension(files.First(x => x.EndsWith(".mdf")));
-        //        }
-        //    }
-        //    Logger.Info($"GetUsedBackup({db.Instance}\\{db.Name}) failed (not found)");
-        //    return "";
-        //}
-
-
     }
-
-    class Field
-    {
-        public string Table     { get; set; }
-        public string Column    { get; set; }
-        public string DataType  { get; set; }
-        public short  Length    { get; set; }
-        public byte   Precision { get; set; }
-        public byte   Scale     { get; set; }
-        public bool   Nullable  { get; set; }
-        public bool   Identity  { get; set; }
-    }
-
-
 }

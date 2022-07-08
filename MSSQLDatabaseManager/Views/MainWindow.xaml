@@ -9,10 +9,10 @@
         WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         Title="{Binding Source={x:Static local:g.TabManager}, Path=SelectedTab.TabName}" 
-        Background="#222" 
+        Background="{DynamicResource Gray2}" 
         Closing="MainWindow_OnClosing"
         Height="720" MinHeight="720" 
-        Width="1000" MinWidth="1000" 
+        Width="1280" MinWidth="1280" 
         AllowsTransparency="True" ResizeMode="CanResize" Style="{StaticResource VS2012WindowStyle}">
     <Grid Margin="0,0,0,0" Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
@@ -20,7 +20,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Grid.Row="1" BorderThickness="1" BorderBrush="#955" Height="1"/>
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource WeakRed}" Height="1"/>
         <Frame Grid.Row="2" NavigationUIVisibility="Hidden" Content="{Binding Source={x:Static local:g.TabManager}, Path=SelectedTab.Page}">
             <Frame.Style>
                 <Style TargetType="Frame">

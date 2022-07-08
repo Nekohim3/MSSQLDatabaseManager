@@ -30,6 +30,46 @@ namespace MSSQLDatabaseManager.ViewModels
             }
         }
 
+        private bool _darkThemeChecked;
+
+        public bool DarkThemeChecked
+        {
+            get => _darkThemeChecked;
+            set
+            {
+                if (!value && !_whiteThemeChecked) return;
+                _darkThemeChecked = value;
+                RaisePropertyChanged(() => DarkThemeChecked);
+                if (_darkThemeChecked)
+                {
+                    WhiteThemeChecked = false;
+                    (App.Current as App).ChangeSkin(Skin.Dark);
+                    g.Settings.Theme = Skin.Dark;
+                    g.Settings.Save();
+                }
+            }
+        }
+
+        private bool _whiteThemeChecked;
+
+        public bool WhiteThemeChecked
+        {
+            get => _whiteThemeChecked;
+            set
+            {
+                if(!value && !_darkThemeChecked) return;
+                _whiteThemeChecked = value;
+                RaisePropertyChanged(() => WhiteThemeChecked); 
+                if (_whiteThemeChecked)
+                {
+                    DarkThemeChecked = false;
+                    (App.Current as App).ChangeSkin(Skin.White);
+                    g.Settings.Theme = Skin.White;
+                    g.Settings.Save();
+                }
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -53,6 +93,12 @@ namespace MSSQLDatabaseManager.ViewModels
             SaveAllCmd = new DelegateCommand(OnSaveAll);
 
             PathToData = g.Settings.DirForDbData;
+            if (App.Skin == Skin.Dark)
+                _darkThemeChecked = true;
+            else
+                _whiteThemeChecked = true;
+            RaisePropertyChanged(() => DarkThemeChecked);
+            RaisePropertyChanged(() => WhiteThemeChecked);
         }
 
         #endregion
