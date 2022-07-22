@@ -19,7 +19,6 @@ namespace MSSQLDatabaseManager.ViewModels
 {
     public class DbManagerViewModel : NotificationObject
     {
-
         #region Properties
 
         #region AddInstance
@@ -197,14 +196,15 @@ namespace MSSQLDatabaseManager.ViewModels
         public DelegateCommand CancelAddDatabaseCmd  { get; }
         public DelegateCommand RefreshDatabasesCmd   { get; }
 
-        public DelegateCommand SetCmd             { get; }
-        public DelegateCommand UnsetCmd           { get; }
-        public DelegateCommand BackupCmd          { get; }
-        public DelegateCommand RestoreSetCmd      { get; }
-        public DelegateCommand RestoreUnsetCmd    { get; }
-        public DelegateCommand CopyDatabaseSetCmd { get; }
+        public DelegateCommand SetCmd               { get; }
+        public DelegateCommand UnsetCmd             { get; }
+        public DelegateCommand BackupCmd            { get; }
+        public DelegateCommand RestoreSetCmd        { get; }
+        public DelegateCommand RestoreUnsetCmd      { get; }
+        public DelegateCommand CopyDatabaseSetCmd   { get; }
         public DelegateCommand CopyDatabaseUnsetCmd { get; }
-        public DelegateCommand DeleteDatabaseCmd  { get; }
+        public DelegateCommand DeleteDatabaseCmd    { get; }
+        public DelegateCommand TestCmd              { get; }
 
         #endregion
 
@@ -229,12 +229,19 @@ namespace MSSQLDatabaseManager.ViewModels
             CopyDatabaseUnsetCmd = new DelegateCommand(OnCopyDatabaseUnset,   () => SelectedDatabase != null);
             DeleteDatabaseCmd  = new DelegateCommand(OnDeleteDatabase, () => SelectedDatabase != null);
 
+            TestCmd = new DelegateCommand(OnTest);
+
             RefreshDatabases();
         }
 
         #endregion
 
         #region CmdExec
+
+        private void OnTest()
+        {
+
+        }
 
         private void OnAddDatabase()
         {
@@ -440,20 +447,12 @@ namespace MSSQLDatabaseManager.ViewModels
 
         private void OnDeleteDatabase()
         {
-            //if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
-            //    g.StartLongOperation(() =>
-            //                         {
-            //                             g.LoadingControlVM.LoadingText = $"Drop database [{SelectedDatabase.Name}]";
-            //                             SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
-            //                             RefreshDatabases();
-            //                         }); 
-            //if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
+            if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
                 g.StartLongOperation(() =>
                                      {
-                                         g.LoadingControlVM.LoadingText = $"Load schema of [{SelectedDatabase.Name}]";
-                                         SelectedDatabase.LoadSchema();
-                                         //SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
-                                         //RefreshDatabases();
+                                         g.LoadingControlVM.LoadingText = $"Drop database [{SelectedDatabase.Name}]";
+                                         SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
+                                         RefreshDatabases();
                                      });
         }
 

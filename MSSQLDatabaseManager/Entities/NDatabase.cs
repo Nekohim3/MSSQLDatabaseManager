@@ -79,7 +79,7 @@ namespace MSSQLDatabaseManager.Entities
         public string IdName => $"{Name.Replace($"_{Id}", "")}_{Id}";
 
         private ObservableCollection<NTable> _tables;
-
+        [JsonIgnore]
         public ObservableCollection<NTable> Tables
         {
             get => _tables;
