@@ -440,12 +440,20 @@ namespace MSSQLDatabaseManager.ViewModels
 
         private void OnDeleteDatabase()
         {
-            if(g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
+            //if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
+            //    g.StartLongOperation(() =>
+            //                         {
+            //                             g.LoadingControlVM.LoadingText = $"Drop database [{SelectedDatabase.Name}]";
+            //                             SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
+            //                             RefreshDatabases();
+            //                         }); 
+            //if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
                 g.StartLongOperation(() =>
                                      {
-                                         g.LoadingControlVM.LoadingText = $"Drop database [{SelectedDatabase.Name}]";
-                                         SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
-                                         RefreshDatabases();
+                                         g.LoadingControlVM.LoadingText = $"Load schema of [{SelectedDatabase.Name}]";
+                                         SelectedDatabase.LoadSchema();
+                                         //SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
+                                         //RefreshDatabases();
                                      });
         }
 

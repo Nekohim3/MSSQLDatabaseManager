@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.Win32;
 using MSSQLDatabaseManager.Entities;
+using Newtonsoft.Json;
 
 namespace MSSQLDatabaseManager.Utils
 {
@@ -49,11 +51,11 @@ namespace MSSQLDatabaseManager.Utils
             var lst = new List<NDatabase>();
             try
             {
-                using (SqlConnection con = new SqlConnection(g.GetConnString(instanceName)))
+                using (var con = new SqlConnection(g.GetConnString(instanceName)))
                 {
                     con.Open();
-                    using (SqlCommand cmd = new SqlCommand("SELECT * from sys.databases", con))
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (var cmd = new SqlCommand("SELECT * from sys.databases", con))
+                    using (var dr = cmd.ExecuteReader())
                         while (dr.Read())
                             if (dr[0].ToString() != "master" && dr[0].ToString() != "tempdb" && dr[0].ToString() != "model" && dr[0].ToString() != "msdb" && dr[12].ToString() == "0")
                                 lst.Add(new NDatabase(instanceName, dr[0].ToString(), int.Parse(dr[1].ToString()), ""));
@@ -77,13 +79,9 @@ namespace MSSQLDatabaseManager.Utils
             {
                 con.Open();
 
-                var cmd1 = new SqlCommand($"ALTER DATABASE {db.Name} SET single_user with rollback immediate;",                 con);
-                var cmd2 = new SqlCommand($"ALTER DATABASE {db.Name} MODIFY NAME = {db.IdName};", con);
-                var cmd3 = new SqlCommand($"ALTER DATABASE {db.IdName} SET MULTI_USER;",          con);
-
-                cmd1.ExecuteNonQuery();
-                cmd2.ExecuteNonQuery();
-                cmd3.ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.Name} SET single_user with rollback immediate;", con).ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.Name} MODIFY NAME = {db.IdName};",               con).ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.IdName} SET MULTI_USER;",                        con).ExecuteNonQuery();
 
                 con.Close();
             }
@@ -94,17 +92,66 @@ namespace MSSQLDatabaseManager.Utils
             using (var con = new SqlConnection(g.GetConnString(db.InstanceName)))
             {
                 con.Open();
-                var cmd1 = new SqlCommand($"ALTER DATABASE {db.Name} SET single_user;",             con);
-                var cmd2 = new SqlCommand($"ALTER DATABASE {db.Name} MODIFY NAME = {db.BaseName};", con);
-                var cmd3 = new SqlCommand($"ALTER DATABASE {db.BaseName} SET MULTI_USER;",          con);
 
-                cmd1.ExecuteNonQuery();
-                cmd2.ExecuteNonQuery();
-                cmd3.ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.Name} SET single_user;",             con).ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.Name} MODIFY NAME = {db.BaseName};", con).ExecuteNonQuery();
+                new SqlCommand($"ALTER DATABASE {db.BaseName} SET MULTI_USER;",          con).ExecuteNonQuery();
 
                 con.Close();
             }
         }
+
+        public static void ClearDatabase(InstanceDb instance, NDatabase db)
+        {
+            using (var con = new SqlConnection(g.GetConnString(db.InstanceName)))
+            {
+                con.Open();
+
+                new SqlCommand("EXEC sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all'", con).ExecuteNonQuery();
+                new SqlCommand("EXEC sp_msforeachtable 'DELETE FROM ?'", con).ExecuteNonQuery();
+                new SqlCommand("EXEC sp_msforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all'", con).ExecuteNonQuery();
+
+                con.Close();
+            }
+
+            ShrinkLogAndFileStream(instance, db);
+        }
+
+        public static void ShrinkLogAndFileStream(InstanceDb instance, NDatabase db)
+        {
+            var conn = new ServerConnection
+                       {
+                           ServerInstance   = $"{g.CompName}\\{instance.InstanceName}",
+                           StatementTimeout = int.MaxValue,
+                           LoginSecure      = false,
+                           Login            = instance.Login,
+                           Password         = instance.Password
+                       };
+
+            var srv = new Server(conn);
+
+            var logFilesNames = (from LogFile x in srv.Databases[db.Name].LogFiles select x.Name).ToList();
+            conn.Disconnect();
+
+            using (var con = new SqlConnection(g.GetConnString(db.InstanceName, db.Name)))
+            {
+                con.Open();
+
+                new SqlCommand($"ALTER DATABASE {db.Name} SET RECOVERY SIMPLE", con).ExecuteNonQuery();
+
+                foreach (var x in logFilesNames)
+                    new SqlCommand($"DBCC SHRINKFILE ({x}, 5)", con).ExecuteNonQuery();
+
+                for (var i = 0; i < 5; i++)
+                    new SqlCommand("EXEC sp_filestream_force_garbage_collection", con).ExecuteNonQuery();
+
+                new SqlCommand($"ALTER DATABASE {db.Name} SET RECOVERY FULL", con).ExecuteNonQuery();
+
+                con.Close();
+            }
+        }
+
+        
 
         public static int RestoreDatabase(InstanceDb instance, string bakFilePath, string dataDirPath) 
         {
@@ -303,6 +350,40 @@ namespace MSSQLDatabaseManager.Utils
                 throw ex;
                 Logger.ErrorQ(ex, "BackupDatabase -> Exception");
                 return false;
+            }
+        }
+
+        public static List<NTable> GetSchemaFromDatabase(string instance, string db)
+        {
+            using (var con = new SqlConnection(g.GetConnString(instance, db)))
+            {
+                con.Open();
+
+                var schema = con.GetSchema("Tables");
+
+                var tableNames = (from DataRow row in schema.Rows select row[2].ToString()).ToList();
+
+                var tables = new List<NTable>();
+
+                foreach (var table in tableNames.OrderBy(x => x).ToList())
+                {
+                    var reader   = new SqlCommand($"SELECT * FROM {table}", con).ExecuteReader();
+                    var sch      = reader.GetSchemaTable();
+                    var columnList = new List<NColumn>();
+                    for (var j = 0; j < reader.FieldCount; j++)
+                    {
+                        var type     = ((Type)sch.Rows[j].ItemArray[12]).FullName;
+                        var nullable = ((bool)sch.Rows[j].ItemArray[13]);
+                        var name     = sch.Rows[j].ItemArray[0].ToString();
+                        columnList.Add(new NColumn(name, type, nullable));
+                    }
+
+                    tables.Add(new NTable(table, columnList));
+                    reader.Close();
+                }
+
+                con.Close();
+                return tables;
             }
         }
     }

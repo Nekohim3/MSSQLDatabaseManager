@@ -6,18 +6,15 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Controls/TextBlock.xaml"/>
+                <ResourceDictionary Source="Styles/Controls/TextBox.xaml"/>
+                <ResourceDictionary Source="Styles/Controls/Separator.xaml"/>
+
                 <ResourceDictionary Source="UI/WindowStyle.xaml" />
-                <ui:SkinResourceDictionary BlueSource="Styles/Dark.xaml" RedSource="Styles/White.xaml"/>
+                <ui:SkinResourceDictionary DarkBlue="Styles/Themes/DarkBlue.xaml" DarkRed="Styles/Themes/DarkRed.xaml" LightBlue="Styles/Themes/LightBlue.xaml" LightRed="Styles/Themes/LightRed.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="TextBlock">
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="Foreground" Value="{DynamicResource GrayC}"/>
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="Foreground" Value="{DynamicResource GrayC}"/>
-                <Setter Property="Background" Value="{DynamicResource Gray3}"/>
-            </Style>
+            
+            
             <Style TargetType="ListView" x:Key="ListViewStyle">
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="Foreground" Value="{DynamicResource GrayC}"/>
@@ -155,6 +152,8 @@
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="Foreground" Value="{DynamicResource GrayC}"/>
                 <Setter Property="Background" Value="{DynamicResource Gray2}"/>
+                <Setter Property="Margin" Value="4,2,4,2"/>
+                <Setter Property="Height" Value="20"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
@@ -293,21 +292,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style TargetType="{x:Type Separator}"
-               BasedOn="{DynamicResource {x:Type Separator}}">
-                <Setter Property="Margin" Value="6,0,6,0"/>
-                <Setter Property="LayoutTransform">
-                    <Setter.Value>
-                        <TransformGroup>
-                            <TransformGroup.Children>
-                                <TransformCollection>
-                                    <RotateTransform Angle="90"/>
-                                </TransformCollection>
-                            </TransformGroup.Children>
-                        </TransformGroup>
-                    </Setter.Value>
-                </Setter>
-            </Style>
             <Style TargetType="DataGrid">
                 <Setter Property="AutoGenerateColumns" Value="False" />
                 <Setter Property="CanUserAddRows" Value="False" />
@@ -430,7 +414,7 @@
                         <ControlTemplate TargetType="{x:Type DataGridCell}">
                             <Border x:Name="border" BorderBrush="Transparent"  Background="Transparent" Style="{DynamicResource CellEmptyBorder}"
                                     SnapsToDevicePixels="True" >
-                                <ContentPresenter HorizontalAlignment="Left" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsReadOnly" Value="False">
@@ -451,7 +435,7 @@
                         <ControlTemplate TargetType="{x:Type DataGridCell}">
                             <Border x:Name="border" BorderBrush="Transparent"  Background="Transparent" Style="{DynamicResource CellEmptyBorder}"
                                     SnapsToDevicePixels="True" >
-                                <ContentPresenter HorizontalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsReadOnly" Value="False">

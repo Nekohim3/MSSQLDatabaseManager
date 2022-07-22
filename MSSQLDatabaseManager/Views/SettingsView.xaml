@@ -35,12 +35,16 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Margin="3,0,3,0" Content="DarkRed Theme" IsChecked="{Binding DarkThemeChecked}"/>
-                <CheckBox Grid.Column="1" Margin="3,0,3,0" Content="WhiteBlue Theme" IsChecked="{Binding WhiteThemeChecked}"/>
+                <CheckBox Grid.Column="0" Margin="3,0,3,0" Content="DarkRed Theme" IsChecked="{Binding DarkRedThemeChecked}"/>
+                <CheckBox Grid.Column="1" Margin="3,0,3,0" Content="DarkBlue Theme" IsChecked="{Binding DarkBlueThemeChecked}"/>
+                <CheckBox Grid.Column="2" Margin="3,0,3,0" Content="LightRed Theme" IsChecked="{Binding LightRedThemeChecked}"/>
+                <CheckBox Grid.Column="3" Margin="3,0,3,0" Content="LightBlue Theme" IsChecked="{Binding LightBlueThemeChecked}"/>
             </Grid>
         </GroupBox>
 

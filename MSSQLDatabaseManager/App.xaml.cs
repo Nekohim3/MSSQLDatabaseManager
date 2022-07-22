@@ -12,13 +12,13 @@ using MSSQLDatabaseManager.ViewModels;
 
 namespace MSSQLDatabaseManager
 {
-    public enum Skin { White, Dark }
+    public enum Skin { DarkRed, DarkBlue, LightRed, LightBlue }
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        public static Skin Skin { get; set; } = Skin.Dark;
+        public static Skin Skin { get; set; } = Skin.DarkRed;
         protected override void OnStartup(StartupEventArgs e)
         {
             Logger.Init();

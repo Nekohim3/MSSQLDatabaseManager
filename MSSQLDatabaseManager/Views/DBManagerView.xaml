@@ -29,7 +29,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Visibility="{Binding AddInstanceMode, Converter={StaticResource BoolToVisibilityReverseConverter}}">
-            <!--{Binding AddInstanceMode, Converter={StaticResource BoolToVisibilityReverseConverter}}-->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -64,7 +63,7 @@
             <Button Grid.Column="4" Grid.Row="0" Content="Confirm" Width="50" Margin="3" Command="{Binding ConfirmAddDatabaseCmd}"/>
             <Button Grid.Column="5" Grid.Row="0" Content="Cancel" Width="50" Margin="3" Command="{Binding CancelAddDatabaseCmd}"/>
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Login: " Margin="3" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Grid.Row="1" Margin="3" Text="{Binding AddDatabaseLogin}"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Margin="2" Text="{Binding AddDatabaseLogin}"/>
             <TextBlock Grid.Column="2" Grid.Row="1" Text="Password: " Margin="3" VerticalAlignment="Center"/>
             <TextBox Grid.Column="3" Grid.Row="1" Margin="3" Text="{Binding AddDatabasePassword}"/>
         </Grid>
@@ -72,24 +71,25 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Command="{Binding SetCmd}" Content="Set" Margin="3" Width="50" Height="20"/>
-            <Button Grid.Column="1" Command="{Binding UnsetCmd}" Content="Unset" Margin="3" Width="50" Height="20"/>
-            <Button Grid.Column="3" Command="{Binding RestoreSetCmd}" Content="Restore/Set" Margin="3" Width="80" Height="20"/>
-            <Button Grid.Column="4" Command="{Binding RestoreUnsetCmd}" Content="Restore/Unset" Margin="3" Width="90" Height="20"/>
-            <Button Grid.Column="6" Command="{Binding CopyDatabaseSetCmd}" Content="Copy/Set" Margin="3" Width="80" Height="20"/>
-            <Button Grid.Column="7" Command="{Binding CopyDatabaseUnsetCmd}" Content="Copy/Unset" Margin="3" Width="80" Height="20"/>
-            <Button Grid.Column="9" Command="{Binding BackupCmd}" Content="Backup" Margin="3" Width="50" Height="20"/>
-            <Button Grid.Column="10" Command="{Binding DeleteDatabaseCmd}" Content="Delete" Margin="3" Width="50" Height="20"/>
+            <Button Grid.Column="0" Command="{Binding SetCmd}" Content="Set" Width="50"/>
+            <Button Grid.Column="1" Command="{Binding UnsetCmd}" Content="Unset" Width="50"/>
+            <Separator Grid.Column="2"/>
+            <Button Grid.Column="3" Command="{Binding RestoreSetCmd}" Content="Restore/Set" Width="80"/>
+            <Button Grid.Column="4" Command="{Binding RestoreUnsetCmd}" Content="Restore/Unset" Width="90"/>
+            <Button Grid.Column="6" Command="{Binding CopyDatabaseSetCmd}" Content="Copy/Set" Width="80"/>
+            <Button Grid.Column="7" Command="{Binding CopyDatabaseUnsetCmd}" Content="Copy/Unset" Width="80"/>
+            <Button Grid.Column="9" Command="{Binding BackupCmd}" Content="Backup" Width="50"/>
+            <Button Grid.Column="10" Command="{Binding DeleteDatabaseCmd}" Content="Delete" Width="50"/>
         </Grid>
         <DataGrid Grid.Row="2" ItemsSource="{Binding DatabaseList}" SelectedItem="{Binding SelectedDatabase}" RowStyle="{StaticResource DatabaseRowStyle}">
             <DataGrid.Columns>
@@ -104,7 +104,7 @@
                                         <Setter Property="ContentTemplate">
                                             <Setter.Value>
                                                 <DataTemplate>
-                                                    <TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}"  Width="300" Margin="0,0,-1,0" BorderBrush="Transparent" Background="Transparent"/>
+                                                    <TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TextBoxInDataGridCellStyle}"  Width="300" Margin="0,0,-1,0"/>
                                                 </DataTemplate>
                                             </Setter.Value>
                                         </Setter>

@@ -45,6 +45,17 @@ namespace MSSQLDatabaseManager.Entities
             }
         }
 
+        public NColumn()
+        {
+            
+        }
+
+        public NColumn(string name, string type, bool nullable)
+        {
+            Name = name;
+            Type = type;
+            Nullable = nullable;
+        }
         
     }
 }

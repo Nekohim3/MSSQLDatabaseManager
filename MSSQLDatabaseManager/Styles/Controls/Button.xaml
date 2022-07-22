@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI">
+    <ResourceDictionary.MergedDictionaries>
+        <ui:SkinResourceDictionary DarkBlue="../Themes/DarkBlue.xaml" DarkRed="../Themes/DarkRed.xaml" LightBlue="../Themes/LightBlue.xaml" LightRed="../Themes/LightRed.xaml"/>
+        <ResourceDictionary Source="../Themes/DarkBlue.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Foreground" Value="{DynamicResource GrayC}"/>
+        <Setter Property="Background" Value="{DynamicResource Gray2}"/>
+        <Setter Property="Margin" Value="4,2,4,2"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource WeakRed}" BorderThickness="1" x:Name="BBorder">
+                        <TextBlock Text="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" x:Name="Box"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BBorder" Property="Background" Value="{DynamicResource Gray5}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BBorder" Property="Background" Value="{DynamicResource Gray0}"/>
+                            <Setter TargetName="BBorder" Property="BorderBrush" Value="{DynamicResource WeakRed}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Box" Property="Foreground" Value="{DynamicResource Gray7}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -310,31 +310,76 @@ namespace MSSQLDatabaseManager.UI
     }
     public class SkinResourceDictionary : ResourceDictionary
     {
-        private Uri _redSource;
-        private Uri _blueSource;
+        private Uri _DarkRed;
 
-        public Uri RedSource
+        public Uri DarkRed
         {
-            get { return _redSource; }
+            get => _DarkRed;
             set
             {
-                _redSource = value;
+                _DarkRed = value;
                 UpdateSource();
             }
         }
-        public Uri BlueSource
+
+        private Uri _DarkBlue;
+
+        public Uri DarkBlue
         {
-            get { return _blueSource; }
+            get => _DarkBlue;
             set
             {
-                _blueSource = value;
+                _DarkBlue = value;
+                UpdateSource();
+            }
+        }
+
+        private Uri _LightRed;
+
+        public Uri LightRed
+        {
+            get => _LightRed;
+            set
+            {
+                _LightRed = value;
+                UpdateSource();
+            }
+        }
+
+        private Uri _LightBlue;
+
+        public Uri LightBlue
+        {
+            get => _LightBlue;
+            set
+            {
+                _LightBlue = value;
                 UpdateSource();
             }
         }
 
         public void UpdateSource()
         {
-            var val = App.Skin == Skin.White ? RedSource : BlueSource;
+            Uri val = null;
+            switch (App.Skin)
+            {
+                case Skin.DarkRed:
+                {
+                    val = DarkRed; break;
+                }
+                case Skin.DarkBlue:
+                {
+                    val = DarkBlue; break;
+                }
+                case Skin.LightRed:
+                {
+                    val = LightRed; break;
+                }
+                case Skin.LightBlue:
+                {
+                    val = LightBlue; break;
+                }
+            }
             if (val != null && base.Source != val)
                 base.Source = val;
         }

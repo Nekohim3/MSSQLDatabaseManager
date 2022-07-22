@@ -33,5 +33,16 @@ namespace MSSQLDatabaseManager.Entities
                 RaisePropertyChanged(() => Columns);
             }
         }
+
+        public NTable()
+        {
+            
+        }
+
+        public NTable(string name, List<NColumn> columns)
+        {
+            Name    = name;
+            Columns = new ObservableCollection<NColumn>(columns);
+        }
     }
 }

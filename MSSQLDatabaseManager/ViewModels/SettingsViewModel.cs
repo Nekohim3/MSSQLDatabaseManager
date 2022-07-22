@@ -30,41 +30,89 @@ namespace MSSQLDatabaseManager.ViewModels
             }
         }
 
-        private bool _darkThemeChecked;
+        private bool _darkRedThemeChecked;
 
-        public bool DarkThemeChecked
+        public bool DarkRedThemeChecked
         {
-            get => _darkThemeChecked;
+            get => _darkRedThemeChecked;
             set
             {
-                if (!value && !_whiteThemeChecked) return;
-                _darkThemeChecked = value;
-                RaisePropertyChanged(() => DarkThemeChecked);
-                if (_darkThemeChecked)
+                if(!value && !_darkBlueThemeChecked && !_lightRedThemeChecked && !_lightBlueThemeChecked) return;
+                _darkRedThemeChecked = value;
+                RaisePropertyChanged(() => DarkRedThemeChecked);
+                if (_darkRedThemeChecked)
                 {
-                    WhiteThemeChecked = false;
-                    (App.Current as App).ChangeSkin(Skin.Dark);
-                    g.Settings.Theme = Skin.Dark;
+                    DarkBlueThemeChecked  = false;
+                    LightBlueThemeChecked = false;
+                    LightRedThemeChecked  = false;
+                    (App.Current as App).ChangeSkin(Skin.DarkRed);
+                    g.Settings.Theme = Skin.DarkRed;
                     g.Settings.Save();
                 }
             }
         }
 
-        private bool _whiteThemeChecked;
+        private bool _darkBlueThemeChecked;
 
-        public bool WhiteThemeChecked
+        public bool DarkBlueThemeChecked
         {
-            get => _whiteThemeChecked;
+            get => _darkBlueThemeChecked;
             set
             {
-                if(!value && !_darkThemeChecked) return;
-                _whiteThemeChecked = value;
-                RaisePropertyChanged(() => WhiteThemeChecked); 
-                if (_whiteThemeChecked)
+                if (!value && !_darkRedThemeChecked && !_lightRedThemeChecked && !_lightBlueThemeChecked) return;
+                _darkBlueThemeChecked = value;
+                RaisePropertyChanged(() => DarkBlueThemeChecked);
+                if (_darkBlueThemeChecked)
                 {
-                    DarkThemeChecked = false;
-                    (App.Current as App).ChangeSkin(Skin.White);
-                    g.Settings.Theme = Skin.White;
+                    DarkRedThemeChecked   = false;
+                    LightBlueThemeChecked = false;
+                    LightRedThemeChecked  = false;
+                    (App.Current as App).ChangeSkin(Skin.DarkBlue);
+                    g.Settings.Theme = Skin.DarkBlue;
+                    g.Settings.Save();
+                }
+            }
+        }
+
+        private bool _lightRedThemeChecked;
+
+        public bool LightRedThemeChecked
+        {
+            get => _lightRedThemeChecked;
+            set
+            {
+                if (!value && !_darkBlueThemeChecked && !_darkRedThemeChecked && !_lightBlueThemeChecked) return;
+                _lightRedThemeChecked = value;
+                RaisePropertyChanged(() => LightRedThemeChecked);
+                if (_lightRedThemeChecked)
+                {
+                    DarkBlueThemeChecked  = false;
+                    LightBlueThemeChecked = false;
+                    DarkRedThemeChecked   = false;
+                    (App.Current as App).ChangeSkin(Skin.LightRed);
+                    g.Settings.Theme = Skin.LightRed;
+                    g.Settings.Save();
+                }
+            }
+        }
+
+        private bool _lightBlueThemeChecked;
+
+        public bool LightBlueThemeChecked
+        {
+            get => _lightBlueThemeChecked;
+            set
+            {
+                if (!value && !_darkBlueThemeChecked && !_lightRedThemeChecked && !_darkRedThemeChecked) return;
+                _lightBlueThemeChecked = value;
+                RaisePropertyChanged(() => LightBlueThemeChecked);
+                if (_lightBlueThemeChecked)
+                {
+                    DarkBlueThemeChecked = false;
+                    DarkRedThemeChecked  = false;
+                    LightRedThemeChecked = false;
+                    (App.Current as App).ChangeSkin(Skin.LightBlue);
+                    g.Settings.Theme = Skin.LightBlue;
                     g.Settings.Save();
                 }
             }
@@ -93,12 +141,18 @@ namespace MSSQLDatabaseManager.ViewModels
             SaveAllCmd = new DelegateCommand(OnSaveAll);
 
             PathToData = g.Settings.DirForDbData;
-            if (App.Skin == Skin.Dark)
-                _darkThemeChecked = true;
+            if (App.Skin == Skin.DarkRed)
+                _darkRedThemeChecked = true;
+            else if (App.Skin == Skin.DarkBlue)
+                _darkBlueThemeChecked = true;
+            else if (App.Skin == Skin.LightRed)
+                _lightRedThemeChecked = true;
             else
-                _whiteThemeChecked = true;
-            RaisePropertyChanged(() => DarkThemeChecked);
-            RaisePropertyChanged(() => WhiteThemeChecked);
+                _lightBlueThemeChecked = true;
+            RaisePropertyChanged(() => DarkRedThemeChecked);
+            RaisePropertyChanged(() => DarkBlueThemeChecked);
+            RaisePropertyChanged(() => LightRedThemeChecked);
+            RaisePropertyChanged(() => LightBlueThemeChecked);
         }
 
         #endregion

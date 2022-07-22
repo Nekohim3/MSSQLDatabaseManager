@@ -9,7 +9,7 @@
                     xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI">
 
     <ResourceDictionary.MergedDictionaries>
-        <ui:SkinResourceDictionary BlueSource="../Styles/Dark.xaml" RedSource="../Styles/White.xaml"/>
+        <ui:SkinResourceDictionary DarkBlue="../Styles/Themes/DarkBlue.xaml" DarkRed="../Styles/Themes/DarkRed.xaml" LightBlue="../Styles/Themes/LightBlue.xaml" LightRed="../Styles/Themes/LightRed.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="VS2012WindowStyleTitleBarButton" TargetType="{x:Type Button}">
         <Setter Property="Focusable" Value="false" />

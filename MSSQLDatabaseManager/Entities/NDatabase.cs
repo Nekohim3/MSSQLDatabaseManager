@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.Prism.ViewModel;
+using MSSQLDatabaseManager.Utils;
 using Newtonsoft.Json;
 
 namespace MSSQLDatabaseManager.Entities
@@ -106,6 +107,20 @@ namespace MSSQLDatabaseManager.Entities
 
         public NDatabase()
         {
+        }
+
+        public void LoadSchema()
+        {
+            if (Id == 0)
+            {
+                // from file
+            }
+            else
+            {
+                //from database
+
+                Tables = new ObservableCollection<NTable>(SQLService.GetSchemaFromDatabase(InstanceName, Name));
+            }
         }
 
     }

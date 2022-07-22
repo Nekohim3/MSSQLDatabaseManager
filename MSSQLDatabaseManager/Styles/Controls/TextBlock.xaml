@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI">
+    <ResourceDictionary.MergedDictionaries>
+        <ui:SkinResourceDictionary DarkBlue="../Themes/DarkBlue.xaml" DarkRed="../Themes/DarkRed.xaml" LightBlue="../Themes/LightBlue.xaml" LightRed="../Themes/LightRed.xaml"/>
+        <ResourceDictionary Source="../Themes/DarkBlue.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBlockForeground}"/>
+        <Setter Property="Background" Value="{DynamicResource TextBlockBackground}"/>
+    </Style>
+</ResourceDictionary>
