@@ -110,6 +110,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Entities\NTabCol.cs" />
     <Compile Include="Utils\DbData.cs" />
     <Compile Include="ViewModels\DBCopyManagerViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />

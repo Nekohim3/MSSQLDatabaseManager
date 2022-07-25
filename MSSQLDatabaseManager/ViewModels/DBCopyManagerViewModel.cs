@@ -4,8 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Practices.Prism;
+using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.ViewModel;
 using MSSQLDatabaseManager.Entities;
+using MSSQLDatabaseManager.Utils;
 
 namespace MSSQLDatabaseManager.ViewModels
 {
@@ -59,7 +62,7 @@ namespace MSSQLDatabaseManager.ViewModels
             {
                 _selectedSourceRight = value;
                 RaisePropertyChanged(() => SelectedSourceRight);
-                _isRightSourceFile = _selectedSourceRight == "File";
+                IsRightSourceFile = _selectedSourceRight == "File";
             }
         }
 
@@ -72,6 +75,11 @@ namespace MSSQLDatabaseManager.ViewModels
             {
                 _isLeftSourceFile = value;
                 RaisePropertyChanged(() => IsLeftSourceFile);
+                if (!_isLeftSourceFile)
+                {
+                    InstanceListLeft     = new ObservableCollection<InstanceDb>(g.Settings.InstanceList);
+                    SelectedInstanceLeft = InstanceListLeft.FirstOrDefault();
+                }
             }
         }
 
@@ -84,6 +92,11 @@ namespace MSSQLDatabaseManager.ViewModels
             {
                 _isRightSourceFile = value;
                 RaisePropertyChanged(() => IsRightSourceFile);
+                if (!_isRightSourceFile)
+                {
+                    InstanceListRight     = new ObservableCollection<InstanceDb>(g.Settings.InstanceList);
+                    SelectedInstanceRight = InstanceListRight.FirstOrDefault();
+                }
             }
         }
 
@@ -108,6 +121,12 @@ namespace MSSQLDatabaseManager.ViewModels
             {
                 _selectedInstanceLeft = value;
                 RaisePropertyChanged(() => SelectedInstanceLeft);
+                if (value != null)
+                {
+                    DatabaseListLeft = new ObservableCollection<NDatabase>(SQLService.GetDatabases(_selectedInstanceLeft.InstanceName).Where(x => x.Name.StartsWith(_selectedInstanceLeft.DatabaseName))
+                                                                                     .ToList());
+                    SelectedDatabaseLeft = DatabaseListLeft.FirstOrDefault();
+                }
             }
         }
 
@@ -135,6 +154,58 @@ namespace MSSQLDatabaseManager.ViewModels
             }
         }
 
+        private ObservableCollection<NTabCol> _tabColListLeft;
+
+        public ObservableCollection<NTabCol> TabColListLeft
+        {
+            get => _tabColListLeft;
+            set
+            {
+                _tabColListLeft = value;
+                RaisePropertyChanged(() => TabColListLeft);
+            }
+        }
+
+        private NTabCol _selectedTabColLeft;
+
+        public NTabCol SelectedTabColLeft
+        {
+            get => _selectedTabColLeft;
+            set
+            {
+                if (_selectedTabColLeft != null)
+                    _selectedTabColLeft.OnChangedIsExpanded -= ChangedIsExpandedLeft;
+                _selectedTabColLeft = value;
+                RaisePropertyChanged(() => SelectedTabColLeft);
+                if (_selectedTabColLeft != null)
+                    _selectedTabColLeft.OnChangedIsExpanded += ChangedIsExpandedLeft;
+            }
+        }
+
+        private NTabCol _selectedTabColRight;
+
+        public NTabCol SelectedTabColRight
+        {
+            get => _selectedTabColRight;
+            set
+            {
+                _selectedTabColRight = value;
+                RaisePropertyChanged(() => SelectedTabColRight);
+            }
+        }
+
+        private ObservableCollection<NTabCol> _tabColListRight;
+
+        public ObservableCollection<NTabCol> TabColListRight
+        {
+            get => _tabColListRight;
+            set
+            {
+                _tabColListRight = value;
+                RaisePropertyChanged(() => TabColListRight);
+            }
+        }
+
         private ObservableCollection<InstanceDb> _instanceListRight;
 
         public ObservableCollection<InstanceDb> InstanceListRight
@@ -156,6 +227,12 @@ namespace MSSQLDatabaseManager.ViewModels
             {
                 _selectedInstanceRight = value;
                 RaisePropertyChanged(() => SelectedInstanceRight);
+                if (value != null)
+                {
+                    DatabaseListRight = new ObservableCollection<NDatabase>(SQLService.GetDatabases(_selectedInstanceRight.InstanceName)
+                                                                                      .Where(x => x.Name.StartsWith(_selectedInstanceRight.DatabaseName)).ToList());
+                    SelectedDatabaseRight = DatabaseListRight.FirstOrDefault();
+                }
             }
         }
 
@@ -211,7 +288,8 @@ namespace MSSQLDatabaseManager.ViewModels
 
         #region Commands
 
-
+        public DelegateCommand GetSchemaLeftCmd  { get; }
+        public DelegateCommand GetSchemaRightCmd { get; }
 
         #endregion
 
@@ -219,8 +297,11 @@ namespace MSSQLDatabaseManager.ViewModels
 
         public DBCopyManagerViewModel()
         {
-            SourceListLeft      = new ObservableCollection<string>() { "Database", "File" };
-            SourceListRight     = new ObservableCollection<string>() { "Database", "File" };
+            GetSchemaLeftCmd  = new DelegateCommand(OnGetSchemaLeft);
+            GetSchemaRightCmd = new DelegateCommand(OnGetSchemaRight);
+
+            SourceListLeft      = new ObservableCollection<string>() {"Database", "File"};
+            SourceListRight     = new ObservableCollection<string>() {"Database", "File"};
             SelectedSourceLeft  = SourceListLeft.First();
             SelectedSourceRight = SourceListRight.First();
         }
@@ -229,13 +310,47 @@ namespace MSSQLDatabaseManager.ViewModels
 
         #region CmdExec
 
+        private void OnGetSchemaLeft()
+        {
+            SelectedDatabaseLeft.LoadSchema();
+            TabColListLeft = new ObservableCollection<NTabCol>();
+            TabColListLeft.AddRange(SelectedDatabaseLeft.Tables.Select(x => new NTabCol(x)));
+            //foreach (var x in SelectedDatabaseLeft.Tables)
+            //{
+            //    TabColListLeft.Add(new NTabCol(x));
+            //    TabColListLeft.AddRange(x.Columns.Select(c => new NTabCol(c)));
+            //}
+        }
 
+        private void OnGetSchemaRight()
+        {
+            SelectedDatabaseRight.LoadSchema();
+            TabColListRight = new ObservableCollection<NTabCol>();
+            //foreach (var x in SelectedDatabaseRight.Tables)
+            //{
+            //    TabColListRight.Add(new NTabCol(x));
+            //    TabColListRight.AddRange(x.Columns.Select(c => new NTabCol(c)));
+            //}
+        }
 
         #endregion
 
         #region Funcs
 
-        
+        private void ChangedIsExpandedLeft(bool isExpanded, NTabCol tabCol)
+        {
+            var ind = TabColListLeft.IndexOf(tabCol) + 1;
+            if (isExpanded)
+            {
+                foreach (var x in tabCol.Table.Columns)
+                    TabColListLeft.Insert(ind++, new NTabCol(x));
+            }
+            else
+            {
+                while (ind < TabColListLeft.Count && !TabColListLeft[ind].IsTable)
+                    TabColListLeft.RemoveAt(ind);
+            }
+        }
 
         #endregion
 

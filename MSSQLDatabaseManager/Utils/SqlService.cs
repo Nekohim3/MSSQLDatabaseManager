@@ -367,7 +367,7 @@ namespace MSSQLDatabaseManager.Utils
 
                 foreach (var table in tableNames.OrderBy(x => x).ToList())
                 {
-                    var reader   = new SqlCommand($"SELECT * FROM {table}", con).ExecuteReader();
+                    var reader   = new SqlCommand($"SELECT TOP (1) * FROM {table}", con).ExecuteReader();
                     var sch      = reader.GetSchemaTable();
                     var columnList = new List<NColumn>();
                     for (var j = 0; j < reader.FieldCount; j++)

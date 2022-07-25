@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MSSQLDatabaseManager"
-             xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI">
+             xmlns:ui="clr-namespace:MSSQLDatabaseManager.UI"
+             xmlns:utils="clr-namespace:MSSQLDatabaseManager.Utils">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -78,6 +79,9 @@
                 </Setter>
             </Style>
             <Style TargetType="{x:Type CheckBox}">
+                <Style.Resources>
+                    <utils:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter"/>
+                </Style.Resources>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="SnapsToDevicePixels" Value="true"/>
                 <Setter Property="OverridesDefaultStyle" Value="true"/>
@@ -94,7 +98,7 @@
                                         <!--<Path Width="7" Height="7" x:Name="CheckMark" SnapsToDevicePixels="True" Stroke="{DynamicResource WeakRed}" StrokeThickness="2" Data="M 0 0 L 7 7 M 0 7 L 7 0" RenderOptions.EdgeMode="Aliased" UseLayoutRounding="True"/>-->
                                     </Border>
                                 </BulletDecorator.Bullet>
-                                <TextBlock x:Name="TB" Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{TemplateBinding Content}" Foreground="{DynamicResource GrayC}"/>
+                                <TextBlock x:Name="TB" Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{TemplateBinding Content}" Foreground="{DynamicResource GrayC}" Visibility="{TemplateBinding Content, Converter={StaticResource StringNotEmptyToVisibilityConverter}}"/>
                                 <!--<ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True"/>-->
                             </BulletDecorator>
                             <ControlTemplate.Triggers>

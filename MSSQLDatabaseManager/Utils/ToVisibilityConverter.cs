@@ -11,13 +11,13 @@ namespace MSSQLDatabaseManager.Utils
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibilityConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter,
+        public object Convert(object                           value, Type targetType, object parameter,
                               System.Globalization.CultureInfo culture)
         {
             return (value != null && (bool)value) ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter,
+        public object ConvertBack(object                           value, Type targetType, object parameter,
                                   System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
@@ -79,6 +79,21 @@ namespace MSSQLDatabaseManager.Utils
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
+                                  System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    [ValueConversion(typeof(bool), typeof(Visibility))]
+    public class StringNotEmptyToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object                           value, Type targetType, object parameter,
+                              System.Globalization.CultureInfo culture)
+        {
+            return (value != null && (string)value != String.Empty) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object                           value, Type targetType, object parameter,
                                   System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
