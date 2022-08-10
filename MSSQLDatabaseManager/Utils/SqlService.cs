@@ -230,9 +230,18 @@ namespace MSSQLDatabaseManager.Utils
             return 0;
         }
 
+        public static void DeleteDatabase(InstanceDb instance, List<string> databasesNames)
+        {
+            foreach (var x in databasesNames)
+            {
+                DeleteDatabase(instance, x);
+            }
+        }
+
         public static void DeleteDatabase(InstanceDb instance, string databaseName)
         {
-            Logger.Info("RestoreDatabase()");
+            g.LoadingControlVM.LoadingText = $"Drop database [{databaseName}]";
+            Logger.Info("DeleteDatabase()");
 
             try
             {

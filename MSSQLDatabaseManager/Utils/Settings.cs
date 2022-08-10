@@ -75,11 +75,23 @@ namespace MSSQLDatabaseManager.Utils
             var forAdd    = list.Where(x => savedList.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList();
             foreach (var x in forAdd)
                 savedList.Add(x);
-            var forDelete = savedList.Where(x => list.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList();
-            foreach (var x in forDelete)
+            if (list.Count != 0)
             {
-                savedList.Remove(x);
+                var forDelete     = savedList.Where(x => x.InstanceName == list.First().InstanceName).
+                                              Where(x => x.BaseName == list.First().BaseName).
+                                              Where(x => !list.Select(c => c.Id).Contains(x.Id)).
+                                              ToList();
+                foreach (var x in forDelete)
+                {
+                    savedList.Remove(x);
+                }
             }
+
+            //var forDelete = savedList.Where(x => list.Count(c => c.InstanceName == x.InstanceName && c.Id == x.Id) == 0).ToList();
+            //foreach (var x in forDelete)
+            //{
+            //    savedList.Remove(x);
+            //}
             var forEdit   = new List<NDatabase>();
             foreach (var x in list)
             {

@@ -89,15 +89,15 @@
             <Button Grid.Column="0" Command="{Binding SetCmd}" Content="Set" Width="50"/>
             <Button Grid.Column="1" Command="{Binding UnsetCmd}" Content="Unset" Width="50"/>
             <Separator Grid.Column="2"/>
-            <Button Grid.Column="3" Command="{Binding RestoreSetCmd}" Content="Restore/Set" Width="80"/>
-            <Button Grid.Column="4" Command="{Binding RestoreUnsetCmd}" Content="Restore/Unset" Width="90"/>
-            <Button Grid.Column="6" Command="{Binding CopyDatabaseSetCmd}" Content="Copy/Set" Width="80"/>
-            <Button Grid.Column="7" Command="{Binding CopyDatabaseUnsetCmd}" Content="Copy/Unset" Width="80"/>
-            <Button Grid.Column="9" Command="{Binding BackupCmd}" Content="Backup" Width="50"/>
-            <Button Grid.Column="10" Command="{Binding DeleteDatabaseCmd}" Content="Delete" Width="50"/>
-            <Button Grid.Column="15" Command="{Binding DeleteDatabaseCmd}" Content="Delete" Width="50"/>
+            <Button Grid.Column="3" Command="{Binding RestoreInsCmd}" Content="Restore/INS" Width="80"/>
+            <Button Grid.Column="4" Command="{Binding RestoreSetCmd}" Content="Restore/Set" Width="80"/>
+            <Button Grid.Column="5" Command="{Binding RestoreUnsetCmd}" Content="Restore/Unset" Width="90"/>
+            <Button Grid.Column="7" Command="{Binding CopyDatabaseSetCmd}" Content="Copy/Set" Width="80"/>
+            <Button Grid.Column="8" Command="{Binding CopyDatabaseUnsetCmd}" Content="Copy/Unset" Width="80"/>
+            <Button Grid.Column="10" Command="{Binding BackupCmd}" Content="Backup" Width="50"/>
+            <Button Grid.Column="11" CommandParameter="{Binding ElementName=DG, Path=SelectedItems}" Command="{Binding DeleteDatabaseCmd}" Content="Delete" Width="50"/>
         </Grid>
-        <DataGrid Grid.Row="2" ItemsSource="{Binding DatabaseList}" SelectedItem="{Binding SelectedDatabase}" RowStyle="{StaticResource DatabaseRowStyle}">
+        <DataGrid Grid.Row="2" x:Name="DG" ItemsSource="{Binding DatabaseList}" SelectedItem="{Binding SelectedDatabase}" RowStyle="{StaticResource DatabaseRowStyle}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Width="auto" Binding="{Binding Id}" CellStyle="{StaticResource DataGridCellCentered}"/>
                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>

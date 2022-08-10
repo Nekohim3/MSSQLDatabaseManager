@@ -7,13 +7,15 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Data;
+using System.Windows.Forms;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.ViewModel;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MSSQLDatabaseManager.Entities;
 using MSSQLDatabaseManager.UI;
 using MSSQLDatabaseManager.Utils;
+using Application = System.Windows.Application;
 
 namespace MSSQLDatabaseManager.ViewModels
 {
@@ -200,11 +202,13 @@ namespace MSSQLDatabaseManager.ViewModels
         public DelegateCommand UnsetCmd             { get; }
         public DelegateCommand BackupCmd            { get; }
         public DelegateCommand RestoreSetCmd        { get; }
+        public DelegateCommand RestoreInsCmd        { get; }
         public DelegateCommand RestoreUnsetCmd      { get; }
         public DelegateCommand CopyDatabaseSetCmd   { get; }
         public DelegateCommand CopyDatabaseUnsetCmd { get; }
-        public DelegateCommand DeleteDatabaseCmd    { get; }
-        public DelegateCommand TestCmd              { get; }
+        //public DelegateCommand         DeleteDatabaseCmd    { get; }
+        public DelegateCommand         TestCmd              { get; }
+        public DelegateCommand<object> DeleteDatabaseCmd    { get; }
 
         #endregion
 
@@ -220,14 +224,15 @@ namespace MSSQLDatabaseManager.ViewModels
 
             RefreshDatabasesCmd = new DelegateCommand(OnRefreshDatabases, () => SelectedInstance != null);
 
-            SetCmd             = new DelegateCommand(OnSet,    () => SelectedDatabase != null && SelectedDatabase.Name != SelectedInstance.DatabaseName);
-            UnsetCmd           = new DelegateCommand(OnUnset,  () => SelectedDatabase != null && SelectedDatabase.Name == SelectedInstance.DatabaseName);
-            BackupCmd          = new DelegateCommand(OnBackup, () => SelectedDatabase != null);
-            RestoreSetCmd      = new DelegateCommand(OnRestoreSet);
-            RestoreUnsetCmd    = new DelegateCommand(OnRestoreUnset);
-            CopyDatabaseSetCmd = new DelegateCommand(OnCopyDatabaseSet,   () => SelectedDatabase != null);
-            CopyDatabaseUnsetCmd = new DelegateCommand(OnCopyDatabaseUnset,   () => SelectedDatabase != null);
-            DeleteDatabaseCmd  = new DelegateCommand(OnDeleteDatabase, () => SelectedDatabase != null);
+            SetCmd               = new DelegateCommand(OnSet,    () => SelectedDatabase != null && SelectedDatabase.Name != SelectedInstance.DatabaseName);
+            UnsetCmd             = new DelegateCommand(OnUnset,  () => SelectedDatabase != null && SelectedDatabase.Name == SelectedInstance.DatabaseName);
+            BackupCmd            = new DelegateCommand(OnBackup, () => SelectedDatabase != null);
+            RestoreSetCmd        = new DelegateCommand(OnRestoreSet);
+            RestoreInsCmd        = new DelegateCommand(OnRestoreIns, () => SelectedDatabase != null);
+            RestoreUnsetCmd      = new DelegateCommand(OnRestoreUnset);
+            CopyDatabaseSetCmd   = new DelegateCommand(OnCopyDatabaseSet,   () => SelectedDatabase       != null);
+            CopyDatabaseUnsetCmd = new DelegateCommand(OnCopyDatabaseUnset, () => SelectedDatabase       != null);
+            DeleteDatabaseCmd    = new DelegateCommand<object>(OnDeleteDatabase, (x) => SelectedDatabase != null);
 
             TestCmd = new DelegateCommand(OnTest);
 
@@ -329,6 +334,37 @@ namespace MSSQLDatabaseManager.ViewModels
         {
             if (!Directory.Exists($"{g.Settings.DirForDbData}\\DbData"))
                 Directory.CreateDirectory($"{g.Settings.DirForDbData}\\DbData");
+            if (!Directory.Exists($"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}"))
+                Directory.CreateDirectory($"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}");
+            var ofd = new CommonOpenFileDialog()
+            {
+                Title = $"Select backup for restore {SelectedInstance.DatabaseName} type database",
+                IsFolderPicker = false,
+                InitialDirectory = $"{g.Settings.DirForDbData}\\Backups\\{SelectedInstance.DisplayName.Replace("/", "\\")}\\",
+                Filters = { new CommonFileDialogFilter("MSSQL DB Backup", "bak") }
+            };
+
+            if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                g.StartLongOperation(() =>
+                {
+                    var id = SQLService.RestoreDatabase(SelectedInstance, ofd.FileName,
+                                               $"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}");
+                    RefreshDatabases();
+                    g.LoadingControlVM.LoadingText += $" Done!\nSet database [{SelectedInstance.DatabaseName}]...";
+                    var usedDb = DatabaseList.FirstOrDefault(x => x.IsUsed);
+                    if (usedDb != null)
+                        SQLService.UnsetDatabase(usedDb);
+                    SQLService.SetDatabase(DatabaseList.FirstOrDefault(x => x.Id == id));
+                    RefreshDatabases();
+                });
+            }
+        }
+
+        private void OnRestoreIns()
+        {
+            if (!Directory.Exists($"{g.Settings.DirForDbData}\\DbData"))
+                Directory.CreateDirectory($"{g.Settings.DirForDbData}\\DbData");
             if (!Directory.Exists($"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/",         "\\")}"))
                 Directory.CreateDirectory($"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}");
             var ofd = new CommonOpenFileDialog()
@@ -341,20 +377,31 @@ namespace MSSQLDatabaseManager.ViewModels
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                g.StartLongOperation(() =>
-                                     {
-                                         var id = SQLService.RestoreDatabase(SelectedInstance, ofd.FileName,
-                                                                    $"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}");
-                                         RefreshDatabases();
-                                         g.LoadingControlVM.LoadingText += $" Done!\nSet database [{SelectedInstance.DatabaseName}]...";
-                                         var usedDb = DatabaseList.FirstOrDefault(x => x.IsUsed);
-                                         if (usedDb != null)
-                                             SQLService.UnsetDatabase(usedDb);
-                                         SQLService.SetDatabase(DatabaseList.FirstOrDefault(x => x.Id == id));
-                                         RefreshDatabases();
-                                     });
+                if (g.MsgShow($"Restore backup in selected database [{SelectedDatabase.Name}]?", "Restore confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
+                    g.StartLongOperation(() =>
+                                         {
+                                             var set = false;
+                                             if (SelectedDatabase.IsUsed)
+                                                 set = true;
+                                             SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name); 
+                                             var id = SQLService.RestoreDatabase(SelectedInstance, ofd.FileName,
+                                              $"{g.Settings.DirForDbData}\\DbData\\{SelectedInstance.DisplayName.Replace("/", "\\")}");
+                                             if (set)
+                                             {
+                                                 RefreshDatabases();
+                                                 g.LoadingControlVM.LoadingText += $" Done!\nSet database [{SelectedInstance.DatabaseName}]...";
+                                                 var usedDb = DatabaseList.FirstOrDefault(x => x.IsUsed);
+                                                 if (usedDb != null)
+                                                     SQLService.UnsetDatabase(usedDb);
+                                                 SQLService.SetDatabase(DatabaseList.FirstOrDefault(x => x.Id == id));
+                                             }
+                                             RefreshDatabases();
+                                         });
             }
+            
         }
+
+
 
         private void OnRestoreUnset()
         {
@@ -445,16 +492,20 @@ namespace MSSQLDatabaseManager.ViewModels
                                  });
         }
 
-        private void OnDeleteDatabase()
+        private void OnDeleteDatabase(object selectedItems)
         {
-            if (g.MsgShow($"Delete database [{SelectedDatabase.Name}]?", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
+            var lst = (selectedItems as ObservableCollection<object>).Cast<NDatabase>().ToList();
+            var str = string.Join("\n", lst.Select(x => x.Name));
+            if (g.MsgShow($"Delete selected databases?\n{str}", "Delete confirmation", NMsgButtons.YesNo) == NMsgReply.Yes)
                 g.StartLongOperation(() =>
                                      {
-                                         g.LoadingControlVM.LoadingText = $"Drop database [{SelectedDatabase.Name}]";
-                                         SQLService.DeleteDatabase(SelectedInstance, SelectedDatabase.Name);
+                                         
+                                         SQLService.DeleteDatabase(SelectedInstance, lst.Select(x => x.Name).ToList());
                                          RefreshDatabases();
                                      });
         }
+
+
 
         private void RaiseCanExecChanged()
         {
@@ -470,7 +521,7 @@ namespace MSSQLDatabaseManager.ViewModels
             RestoreUnsetCmd.RaiseCanExecuteChanged();
             DeleteDatabaseCmd.RaiseCanExecuteChanged();
             CopyDatabaseSetCmd.RaiseCanExecuteChanged();
-            CopyDatabaseUnsetCmd.RaiseCanExecuteChanged();
+            RestoreInsCmd.RaiseCanExecuteChanged();
         }
 
         #endregion
@@ -494,6 +545,7 @@ namespace MSSQLDatabaseManager.ViewModels
             InstanceList     = new ObservableCollection<InstanceDb>(g.Settings.InstanceList);
             SelectedInstance = selIns == null ? InstanceList.FirstOrDefault() : InstanceList.FirstOrDefault(x => x.DisplayName == selIns.DisplayName);
             SelectedDatabase = selDb  == null ? null : DatabaseList.FirstOrDefault(x => x.Id                                            == selDb.Id);
+            g.Settings.CheckDbList(DatabaseList.ToList());
             RaiseCanExecChanged();
         }
 
